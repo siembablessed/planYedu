@@ -3,8 +3,8 @@ import { BudgetCategory, BudgetExpense } from "@/types";
 import { Platform } from "react-native";
 
 // Lazy load mobile-only modules
-let FileSystemModule: typeof import("expo-file-system") | null = null;
-let SharingModule: typeof import("expo-sharing") | null = null;
+let FileSystemModule: any = null;
+let SharingModule: any = null;
 
 async function getMobileModules() {
   if (Platform.OS === "web") {
@@ -14,10 +14,40 @@ async function getMobileModules() {
   // Load modules if not already loaded
   if (!FileSystemModule || !SharingModule) {
     try {
-      FileSystemModule = await import("expo-file-system");
-      SharingModule = await import("expo-sharing");
+      // Use dynamic import with proper error handling
+      const fileSystemPromise = import("expo-file-system").catch((err) => {
+        console.warn("Failed to load expo-file-system:", err);
+        return null;
+      });
+      
+      const sharingPromise = import("expo-sharing").catch((err) => {
+        console.warn("Failed to load expo-sharing:", err);
+        return null;
+      });
+      
+      const [fileSystem, sharing] = await Promise.all([fileSystemPromise, sharingPromise]);
+      
+      if (!fileSystem || !sharing) {
+        console.warn("expo-file-system or expo-sharing not available:", { fileSystem: !!fileSystem, sharing: !!sharing });
+        return { FileSystem: null, Sharing: null };
+      }
+      
+      // Handle both default and named exports
+      FileSystemModule = fileSystem.default || fileSystem;
+      SharingModule = sharing.default || sharing;
+      
+      // Verify the modules have the required properties
+      if (!FileSystemModule.documentDirectory || !FileSystemModule.writeAsStringAsync) {
+        console.warn("expo-file-system module missing required properties");
+        return { FileSystem: null, Sharing: null };
+      }
+      
+      if (!SharingModule.shareAsync) {
+        console.warn("expo-sharing module missing required properties");
+        return { FileSystem: null, Sharing: null };
+      }
     } catch (error) {
-      // Silently fail - will show error when trying to export
+      console.warn("Error loading mobile modules:", error);
       return { FileSystem: null, Sharing: null };
     }
   }
@@ -112,6 +142,15 @@ export async function exportBudgetToExcel(
         throw new Error("expo-file-system and expo-sharing are required for mobile export. Please install them: npx expo install expo-file-system expo-sharing");
       }
 
+      // Check if required methods exist
+      if (!FileSystem.documentDirectory || !FileSystem.writeAsStringAsync) {
+        throw new Error("expo-file-system is not properly installed or initialized");
+      }
+
+      if (!Sharing.shareAsync) {
+        throw new Error("expo-sharing is not properly installed or initialized");
+      }
+
       const wbout = XLSX.write(workbook, { type: "base64", bookType: "xlsx" });
       const fileUri = FileSystem.documentDirectory + fileName;
       
@@ -120,13 +159,15 @@ export async function exportBudgetToExcel(
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      // Check if sharing is available
-      const isAvailable = await Sharing.isAvailableAsync();
-      if (isAvailable) {
-        await Sharing.shareAsync(fileUri);
-      } else {
-        throw new Error("Sharing is not available on this device");
+      // Check if sharing is available and share the file
+      if (Sharing.isAvailableAsync) {
+        const isAvailable = await Sharing.isAvailableAsync();
+        if (!isAvailable) {
+          throw new Error("Sharing is not available on this device");
+        }
       }
+      
+      await Sharing.shareAsync(fileUri);
     }
   } catch (error) {
     console.error("Export error:", error);

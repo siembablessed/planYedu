@@ -17,14 +17,23 @@ export const [AuthContext, useAuth] = createContextHook(() => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession()
-      .then(({ data: { session }, error }) => {
+    let subscription: any = null;
+    let isMounted = true;
+
+    // Get initial session and set up auth listener
+    const initializeAuth = async () => {
+      try {
+        // Get initial session
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (!isMounted) return;
+        
         if (error) {
           console.warn("Auth error:", error);
           setIsLoading(false);
           return;
         }
+        
         setSession(session);
         if (session?.user) {
           setUser({
@@ -34,29 +43,41 @@ export const [AuthContext, useAuth] = createContextHook(() => {
           });
         }
         setIsLoading(false);
-      })
-      .catch(() => {
-        // Supabase not configured - allow app to work without auth
-        setIsLoading(false);
-      });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session?.user) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email || "",
-          name: session.user.user_metadata?.name || session.user.email?.split("@")[0],
+        // Listen for auth changes
+        const authResult = supabase.auth.onAuthStateChange((_event, newSession) => {
+          if (!isMounted) return;
+          
+          setSession(newSession);
+          if (newSession?.user) {
+            setUser({
+              id: newSession.user.id,
+              email: newSession.user.email || "",
+              name: newSession.user.user_metadata?.name || newSession.user.email?.split("@")[0],
+            });
+          } else {
+            setUser(null);
+          }
+          setIsLoading(false);
         });
-      } else {
-        setUser(null);
+        
+        // Handle subscription properly
+        if (authResult?.data?.subscription) {
+          subscription = authResult.data.subscription;
+        }
+      } catch (error) {
+        // Supabase not configured - allow app to work without auth
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-      setIsLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     return () => {
-      if (subscription) {
+      isMounted = false;
+      if (subscription && typeof subscription.unsubscribe === "function") {
         subscription.unsubscribe();
       }
     };

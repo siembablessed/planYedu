@@ -64,13 +64,31 @@ export const supabase = {
       if (!IS_SUPABASE_CONFIGURED) {
         return { data: { subscription: { unsubscribe: () => {} } } };
       }
+      // onAuthStateChange is synchronous, but we need to load the client first
+      // For now, return a dummy subscription and set up the real one asynchronously
+      let subscription: any = { unsubscribe: () => {} };
+      
+      // Load client and set up the real subscription
       loadSupabase().then((client) => {
         if (client) {
-          return client.auth.onAuthStateChange(callback);
+          try {
+            const result = client.auth.onAuthStateChange(callback);
+            if (result?.data?.subscription) {
+              subscription = result.data.subscription;
+            }
+          } catch (error) {
+            console.warn("Error setting up auth state change listener:", error);
+          }
         }
-        return { data: { subscription: { unsubscribe: () => {} } } };
+      }).catch((error) => {
+        console.warn("Error loading Supabase client for auth:", error);
       });
-      return { data: { subscription: { unsubscribe: () => {} } } };
+      
+      return { 
+        data: { 
+          subscription 
+        } 
+      };
     },
     signUp: async (credentials: any) => {
       if (!IS_SUPABASE_CONFIGURED) {

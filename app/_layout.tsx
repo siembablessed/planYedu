@@ -5,7 +5,8 @@ import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PlannerContext } from "@/contexts/PlannerContext";
 import { AuthContext, useAuth } from "@/contexts/AuthContext";
-import { StyleSheet, View, ActivityIndicator } from "react-native";
+import { StyleSheet, View, ActivityIndicator, Platform } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import colors from "@/constants/colors";
 
 SplashScreen.preventAutoHideAsync();
@@ -48,6 +49,7 @@ export default function RootLayout() {
       <AuthContext>
         <PlannerContext>
           <GestureHandlerRootView style={styles.container}>
+            <StatusBar style="dark" backgroundColor={colors.background} translucent={false} />
             <RootLayoutNav />
           </GestureHandlerRootView>
         </PlannerContext>
