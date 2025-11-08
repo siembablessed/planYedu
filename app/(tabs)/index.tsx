@@ -144,26 +144,42 @@ export default function OverviewScreen() {
           {/* Stats Grid */}
           <View style={styles.statsGrid}>
             <View style={[styles.statCard, { backgroundColor: "#EC4899" }]}>
-              <ListTodo size={24} color={colors.surface} />
-              <Text style={styles.statCardNumber}>{stats.total}</Text>
-              <Text style={styles.statCardLabel}>Total Tasks</Text>
+              <View style={styles.statCardWatermark}>
+                <ListTodo size={64} color={colors.surface} style={{ opacity: 0.25 }} />
+              </View>
+              <View style={styles.statCardContent}>
+                <Text style={styles.statCardNumber}>{stats.total}</Text>
+                <Text style={styles.statCardLabel}>Total Tasks</Text>
+              </View>
             </View>
             <View style={[styles.statCard, { backgroundColor: "#10B981" }]}>
-              <CheckCircle2 size={24} color={colors.surface} />
-              <Text style={styles.statCardNumber}>{stats.completed}</Text>
-              <Text style={styles.statCardLabel}>Completed</Text>
+              <View style={styles.statCardWatermark}>
+                <CheckCircle2 size={64} color={colors.surface} style={{ opacity: 0.25 }} />
+              </View>
+              <View style={styles.statCardContent}>
+                <Text style={styles.statCardNumber}>{stats.completed}</Text>
+                <Text style={styles.statCardLabel}>Completed</Text>
+              </View>
             </View>
             <View style={[styles.statCard, { backgroundColor: "#F59E0B" }]}>
-              <Clock size={24} color={colors.surface} />
-              <Text style={styles.statCardNumber}>{stats.inProgress}</Text>
-              <Text style={styles.statCardLabel}>In Progress</Text>
+              <View style={styles.statCardWatermark}>
+                <Clock size={64} color={colors.surface} style={{ opacity: 0.25 }} />
+              </View>
+              <View style={styles.statCardContent}>
+                <Text style={styles.statCardNumber}>{stats.inProgress}</Text>
+                <Text style={styles.statCardLabel}>In Progress</Text>
+              </View>
             </View>
             <View style={[styles.statCard, { backgroundColor: "#8B5CF6" }]}>
-              <DollarSign size={24} color={colors.surface} />
-              <Text style={styles.statCardNumber}>
-                ${stats.totalPrice.toLocaleString()}
-              </Text>
-              <Text style={styles.statCardLabel}>Total Cost</Text>
+              <View style={styles.statCardWatermark}>
+                <DollarSign size={64} color={colors.surface} style={{ opacity: 0.25 }} />
+              </View>
+              <View style={styles.statCardContent}>
+                <Text style={styles.statCardNumber}>
+                  ${stats.totalPrice.toLocaleString()}
+                </Text>
+                <Text style={styles.statCardLabel}>Total Cost</Text>
+              </View>
             </View>
           </View>
 
@@ -606,19 +622,39 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    position: "relative",
+    overflow: "hidden",
+    minHeight: 120,
+  },
+  statCardWatermark: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 0,
+  },
+  statCardContent: {
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+    position: "relative",
   },
   statCardNumber: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "700" as const,
     color: colors.surface,
-    marginTop: 8,
     marginBottom: 4,
+    textAlign: "center",
   },
   statCardLabel: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "600" as const,
     color: colors.surface,
-    opacity: 0.9,
+    opacity: 0.95,
+    textAlign: "center",
   },
   progressCard: {
     backgroundColor: colors.surface,

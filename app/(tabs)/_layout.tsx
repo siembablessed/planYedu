@@ -2,8 +2,7 @@ import { Tabs } from "expo-router";
 import {
   ListChecks,
   Wallet,
-  Sparkles,
-  Users,
+  Heart,
 } from "lucide-react-native";
 import React from "react";
 import { View, StyleSheet, Platform } from "react-native";
@@ -86,25 +85,28 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="ai"
+        name="vows"
         options={{
-          title: "AI Help",
+          title: "Vows",
           tabBarIcon: ({ focused }) => (
-            <TabIcon Icon={Sparkles} active={focused} />
+            <TabIcon Icon={Heart} active={focused} />
           ),
         }}
       />
       <Tabs.Screen
         name="shared"
         options={{
-          title: "Shared",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon Icon={Users} active={focused} />
-          ),
+          href: null, // Hide from tab bar
         }}
       />
       <Tabs.Screen
         name="profile"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="ai"
         options={{
           href: null, // Hide from tab bar
         }}

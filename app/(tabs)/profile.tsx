@@ -20,6 +20,7 @@ import {
   Bell,
   HelpCircle,
   AlertCircle,
+  Users,
 } from "lucide-react-native";
 import colors from "@/constants/colors";
 import * as Haptics from "expo-haptics";
@@ -169,6 +170,20 @@ export default function ProfileScreen() {
         {/* Settings Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Settings</Text>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              if (Platform.OS !== "web") {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
+              router.push("/(tabs)/shared");
+            }}
+          >
+            <View style={styles.menuItemLeft}>
+              <Users size={20} color={colors.text} />
+              <Text style={styles.menuItemText}>Shared & Collaboration</Text>
+            </View>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem}>
             <View style={styles.menuItemLeft}>
               <Bell size={20} color={colors.text} />
