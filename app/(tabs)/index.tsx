@@ -19,11 +19,12 @@ import {
   ChevronRight,
   Filter,
   Circle,
+  User,
 } from "lucide-react-native";
 import colors from "@/constants/colors";
 import { Task, TaskStatus } from "@/types";
 import * as Haptics from "expo-haptics";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useTasks } from "@/hooks/useTasks";
 import { useBudget } from "@/hooks/useBudget";
 import TaskCard from "@/components/tasks/TaskCard";
@@ -33,6 +34,7 @@ import CreateEventSheet from "@/components/events/CreateEventSheet";
 import AddTaskSheet from "@/components/tasks/AddTaskSheet";
 
 export default function OverviewScreen() {
+  const router = useRouter();
   const {
     projects,
     selectedEventId,
@@ -110,6 +112,19 @@ export default function OverviewScreen() {
             backgroundColor: colors.surface,
           },
           headerShadowVisible: false,
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => {
+                if (Platform.OS !== "web") {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }
+                router.push("/(tabs)/profile");
+              }}
+              style={{ marginRight: 16 }}
+            >
+              <User size={24} color={colors.text} />
+            </TouchableOpacity>
+          ),
         }}
       />
       <View style={styles.container}>

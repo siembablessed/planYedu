@@ -34,7 +34,22 @@ export default function LoginScreen() {
     setIsLoading(false);
 
     if (error) {
-      Alert.alert("Login Failed", error.message || "Invalid email or password");
+      let errorMessage = error.message || "Invalid email or password";
+      
+      // Provide helpful message if Supabase is not configured
+      if (errorMessage.includes("Supabase not configured") || errorMessage.includes("not configured")) {
+        errorMessage = 
+          "Supabase is not configured.\n\n" +
+          "To enable authentication:\n" +
+          "1. Create a .env file in the project root\n" +
+          "2. Add your Supabase credentials:\n" +
+          "   EXPO_PUBLIC_SUPABASE_URL=your_url\n" +
+          "   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_key\n" +
+          "3. Restart the development server\n\n" +
+          "Get your credentials from: https://supabase.com/dashboard";
+      }
+      
+      Alert.alert("Login Failed", errorMessage);
     } else {
       router.replace("/(tabs)");
     }

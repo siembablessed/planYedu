@@ -9,8 +9,8 @@ import {
   Platform,
 } from "react-native";
 import { useState } from "react";
-import { Stack } from "expo-router";
-import { Sparkles, Send, Lightbulb } from "lucide-react-native";
+import { Stack, useRouter } from "expo-router";
+import { Sparkles, Send, Lightbulb, User } from "lucide-react-native";
 import colors from "@/constants/colors";
 import { useRorkAgent, createRorkTool } from "@/lib/rork-toolkit";
 import { usePlanner } from "@/contexts/PlannerContext";
@@ -18,6 +18,7 @@ import { z } from "zod";
 import * as Haptics from "expo-haptics";
 
 export default function AIAssistantScreen() {
+  const router = useRouter();
   const { addTask, projects, tasks } = usePlanner();
   const [input, setInput] = useState("");
 
@@ -118,6 +119,19 @@ export default function AIAssistantScreen() {
             backgroundColor: colors.surface,
           },
           headerShadowVisible: false,
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => {
+                if (Platform.OS !== "web") {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }
+                router.push("/(tabs)/profile");
+              }}
+              style={{ marginRight: 16 }}
+            >
+              <User size={24} color={colors.text} />
+            </TouchableOpacity>
+          ),
         }}
       />
       <View style={styles.container}>

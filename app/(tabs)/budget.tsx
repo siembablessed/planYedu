@@ -24,16 +24,18 @@ import {
   PieChart,
   BarChart3,
   Check,
+  User,
 } from "lucide-react-native";
 import colors from "@/constants/colors";
 import * as Haptics from "expo-haptics";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { normalizeText, isDuplicateTask } from "@/constants/smartTasks";
 import { exportBudgetToExcel } from "@/lib/exportBudget";
 import { DonutChart } from "@/components/budget/DonutChart";
 import { BarChart } from "@/components/budget/BarChart";
 
 export default function BudgetScreen() {
+  const router = useRouter();
   const { budgetCategories, budgetExpenses } = usePlanner();
   const { totals } = useBudget();
   const [showAddExpense, setShowAddExpense] = useState(false);
@@ -122,17 +124,30 @@ export default function BudgetScreen() {
           },
           headerShadowVisible: false,
           headerRight: () => (
-            <TouchableOpacity
-              onPress={handleExportBudget}
-              style={{ marginRight: 16, padding: 8 }}
-              disabled={isExporting}
-            >
-              {isExporting ? (
-                <ActivityIndicator size="small" color={colors.primary} />
-              ) : (
-                <Download size={24} color={colors.primary} />
-              )}
-            </TouchableOpacity>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginRight: 16 }}>
+              <TouchableOpacity
+                onPress={handleExportBudget}
+                style={{ padding: 8 }}
+                disabled={isExporting}
+              >
+                {isExporting ? (
+                  <ActivityIndicator size="small" color={colors.primary} />
+                ) : (
+                  <Download size={24} color={colors.primary} />
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  if (Platform.OS !== "web") {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
+                  router.push("/(tabs)/profile");
+                }}
+                style={{ padding: 8 }}
+              >
+                <User size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />

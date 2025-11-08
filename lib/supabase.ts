@@ -9,6 +9,14 @@ const IS_SUPABASE_CONFIGURED =
   SUPABASE_URL !== "YOUR_SUPABASE_URL" && 
   SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY";
 
+// Export a helper to check configuration status
+export const isSupabaseConfigured = () => IS_SUPABASE_CONFIGURED;
+export const getSupabaseConfigStatus = () => ({
+  isConfigured: IS_SUPABASE_CONFIGURED,
+  hasUrl: !!SUPABASE_URL && SUPABASE_URL !== "YOUR_SUPABASE_URL",
+  hasKey: !!SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY",
+});
+
 // Dynamic import to avoid bundling issues
 let supabaseModule: any = null;
 let supabaseClient: any = null;

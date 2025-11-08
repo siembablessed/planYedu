@@ -8,13 +8,14 @@ import {
   Platform,
 } from "react-native";
 import { usePlanner } from "@/contexts/PlannerContext";
-import { Stack } from "expo-router";
-import { Users, CheckCircle2, Clock, Circle } from "lucide-react-native";
+import { Stack, useRouter } from "expo-router";
+import { Users, CheckCircle2, Clock, Circle, User } from "lucide-react-native";
 import colors from "@/constants/colors";
 import { Task } from "@/types";
 import * as Haptics from "expo-haptics";
 
 export default function SharedScreen() {
+  const router = useRouter();
   const { getSharedTasks, users, projects, toggleTaskStatus } = usePlanner();
 
   const sharedTasks = getSharedTasks();
@@ -37,6 +38,19 @@ export default function SharedScreen() {
             backgroundColor: colors.surface,
           },
           headerShadowVisible: false,
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => {
+                if (Platform.OS !== "web") {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }
+                router.push("/(tabs)/profile");
+              }}
+              style={{ marginRight: 16 }}
+            >
+              <User size={24} color={colors.text} />
+            </TouchableOpacity>
+          ),
         }}
       />
       <View style={styles.container}>
